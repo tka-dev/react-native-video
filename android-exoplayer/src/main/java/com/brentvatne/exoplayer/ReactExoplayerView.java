@@ -606,7 +606,6 @@ class ReactExoplayerView extends FrameLayout implements
                 case Player.STATE_READY:
                     if (!player.getPlayWhenReady()) {
                         setPlayWhenReady(true);
-                        eventEmitter.playbackRateChange(1);
                     }
                     break;
                 default:
@@ -736,6 +735,8 @@ class ReactExoplayerView extends FrameLayout implements
             case Player.STATE_READY:
                 text += "ready isPaused=" + isPaused;
                 eventEmitter.ready();
+                if(playWhenReady && !isPaused && !isFullscreen)
+                    eventEmitter.playbackRateChange(1);
                 onBuffering(false);
                 startProgressHandler();
                 videoLoaded();
@@ -743,8 +744,6 @@ class ReactExoplayerView extends FrameLayout implements
                 if (playerControlView != null) {
                     playerControlView.show();
                 }
-                if(playWhenReady && !isPaused && !isFullscreen)
-                    eventEmitter.playbackRateChange(1);
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_ENDED:
