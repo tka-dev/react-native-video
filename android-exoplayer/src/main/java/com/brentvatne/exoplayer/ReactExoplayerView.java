@@ -632,11 +632,13 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void stopPlayback() {
+        eventEmitter.playbackRateChange(0);
         onStopPlayback();
         releasePlayer();
     }
 
     private void onStopPlayback() {
+        eventEmitter.playbackRateChange(0);
         audioManager.abandonAudioFocus(this);
     }
 
@@ -741,11 +743,8 @@ class ReactExoplayerView extends FrameLayout implements
                 if (playerControlView != null) {
                     playerControlView.show();
                 }
-                if(!playWhenReady && isPaused) {
-                    eventEmitter.playbackRateChange(0);
-                }else {
+                if(playWhenReady && !isPaused)
                     eventEmitter.playbackRateChange(1);
-                }
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_ENDED:
