@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.brentvatne.react.R;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerControlView;
@@ -33,7 +34,7 @@ public class ExoPlayerFullscreenVideoActivity extends AppCompatActivity implemen
         }
         setContentView(R.layout.exo_player_fullscreen_video);
         player = ReactExoplayerView.getViewInstance(id).getPlayer();
-
+        player.setPlaybackParameters(new PlaybackParameters(1f, 1f));
         ExoPlayerView playerView = findViewById(R.id.player_view);
         playerView.setPlayer(player);
         playerView.setOnClickListener(v -> togglePlayerControlVisibility());
@@ -69,7 +70,7 @@ public class ExoPlayerFullscreenVideoActivity extends AppCompatActivity implemen
     @Override
     public void onPause() {
         super.onPause();
-        player.setPlayWhenReady(false);
+//        player.setPlayWhenReady(false);
         if (ReactExoplayerView.getViewInstance(id) != null) {
             ReactExoplayerView.getViewInstance(id).registerFullScreenDelegate(null);
         }
@@ -133,6 +134,7 @@ public class ExoPlayerFullscreenVideoActivity extends AppCompatActivity implemen
 
     @Override
     public void closeFullScreen() {
+        ReactExoplayerView.getViewInstance(id).setPausedModifier(true);
         finish();
     }
 }
