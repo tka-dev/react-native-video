@@ -644,12 +644,10 @@ class ReactExoplayerView extends FrameLayout implements
                 setPlayWhenReady(false);
             }
         }
-        eventEmitter.playbackRateChange(0);
         setKeepScreenOn(false);
     }
 
     private void stopPlayback() {
-        eventEmitter.playbackRateChange(0);
         onStopPlayback();
         releasePlayer();
     }
@@ -767,6 +765,8 @@ class ReactExoplayerView extends FrameLayout implements
                     playerControlView.show();
                 }
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
+                if(!isPaused)
+                this.startPlayback();
                 break;
             case Player.STATE_ENDED:
                 text += "ended";
@@ -1212,6 +1212,7 @@ class ReactExoplayerView extends FrameLayout implements
                 startPlayback();
             } else {
                 pausePlayback();
+                eventEmitter.playbackRateChange(0);
             }
         }
     }
