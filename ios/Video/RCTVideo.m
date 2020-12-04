@@ -717,18 +717,21 @@ static int const RCTVideoUnset = -1;
       self.onVideoBuffer(@{@"isBuffering": @(NO), @"target": self.reactTag});
     }
   } else if (object == _player) {
-    if([keyPath isEqualToString:playbackRate]) {
-      if(self.onPlaybackRateChange) {
-        self.onPlaybackRateChange(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
-                                    @"target": self.reactTag});
-      }
-      if(_playbackStalled && _player.rate > 0) {
-        if(self.onPlaybackResume) {
-          self.onPlaybackResume(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
-                                  @"target": self.reactTag});
-        }
-        _playbackStalled = NO;
-      }
+      if([keyPath isEqualToString:playbackRate]) {
+            if (_player.rate > 0 && _rate > 0 && _player.rate != _rate) {
+              // Playback is resuming, apply rate modifer.
+              [_player setRate:_rate];
+            } else if(self.onPlaybackRateChange) {
+              self.onPlaybackRateChange(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
+                                          @"target": self.reactTag});
+            }
+            if(_playbackStalled && _player.rate > 0) {
+              if(self.onPlaybackResume) {
+                self.onPlaybackResume(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
+                                        @"target": self.reactTag});
+              }
+              _playbackStalled = NO;
+            }
     }
     else if([keyPath isEqualToString:externalPlaybackActive]) {
       if(self.onVideoExternalPlaybackChange) {
