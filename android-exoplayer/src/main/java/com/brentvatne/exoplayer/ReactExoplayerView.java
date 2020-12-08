@@ -690,6 +690,7 @@ class ReactExoplayerView extends FrameLayout implements
             case AudioManager.AUDIOFOCUS_LOSS:
                 eventEmitter.audioFocusChanged(false);
                 pausePlayback();
+                eventEmitter.playbackRateChange(0);
                 audioManager.abandonAudioFocus(this);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -749,7 +750,7 @@ class ReactExoplayerView extends FrameLayout implements
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_READY:
-                text += "ready isPaused=" + isPaused;
+                text += "ready isPaused=" + isPaused + " isInBackground=" + isInBackground;
                 eventEmitter.ready();
 //                if (isInFullscreen) {
 //                    isInFullscreen = false;
@@ -765,7 +766,7 @@ class ReactExoplayerView extends FrameLayout implements
                     playerControlView.show();
                 }
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
-                if(!isPaused)
+                if(!isPaused && !isInBackground)
                 this.startPlayback();
                 break;
             case Player.STATE_ENDED:
