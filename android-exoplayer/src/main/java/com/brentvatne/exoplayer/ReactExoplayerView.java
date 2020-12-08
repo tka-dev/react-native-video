@@ -766,8 +766,6 @@ class ReactExoplayerView extends FrameLayout implements
                     playerControlView.show();
                 }
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
-                if(!isPaused && !isInBackground)
-                this.startPlayback();
                 break;
             case Player.STATE_ENDED:
                 text += "ended";
@@ -807,6 +805,7 @@ class ReactExoplayerView extends FrameLayout implements
             String trackId = videoFormat != null ? videoFormat.id : "-1";
             eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
+            this.startPlayback();
         }
     }
 
