@@ -260,9 +260,12 @@ class ReactExoplayerView extends FrameLayout implements
         if (isInFullscreen) {
             if (player != null) {
                 exoPlayerView.setPlayer(player);
+                player.setPlayWhenReady(true);
                 syncPlayerState();
             }
+            isPaused = false;
             isInFullscreen = false;
+            this.startPlayback();
         }
 
         isInBackground = false;
