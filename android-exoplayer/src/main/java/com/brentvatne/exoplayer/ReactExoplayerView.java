@@ -756,8 +756,6 @@ class ReactExoplayerView extends FrameLayout implements
 //                    isInFullscreen = false;
 //                    this.startPlayback();
 //                }
-                if (playWhenReady && !isPaused && !isFullscreen && !isInFullscreen)
-                    eventEmitter.playbackRateChange(1);
                 onBuffering(false);
                 startProgressHandler();
                 videoLoaded();
@@ -765,9 +763,11 @@ class ReactExoplayerView extends FrameLayout implements
                 if (playerControlView != null) {
                     playerControlView.show();
                 }
-
-                if (!playWhenReady && isPaused)
+                if (playWhenReady && !isPaused && !isFullscreen && !isInFullscreen) {
+                    eventEmitter.playbackRateChange(1);
+                } else if (!playWhenReady && isPaused) {
                     eventEmitter.playbackRateChange(0);
+                }
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_ENDED:
