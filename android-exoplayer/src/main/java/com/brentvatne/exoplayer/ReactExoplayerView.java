@@ -29,7 +29,6 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -260,13 +259,10 @@ class ReactExoplayerView extends FrameLayout implements
         if (isInFullscreen) {
             if (player != null) {
                 exoPlayerView.setPlayer(player);
-                player.setPlayWhenReady(true);
                 syncPlayerState();
+                player.setPlayWhenReady(true);
             }
-//            isPaused = !player.getPlayWhenReady();
             isInFullscreen = false;
-//            if(!isPaused && player.getPlayWhenReady())
-//            this.startPlayback();
         }
 
         isInBackground = false;
@@ -695,9 +691,8 @@ class ReactExoplayerView extends FrameLayout implements
             case AudioManager.AUDIOFOCUS_LOSS:
                 eventEmitter.audioFocusChanged(false);
                 // Fixed bug sometime click play player does not play
-                //if(isInBackground && !isInFullscreen)
-                pausePlayback();
-//                eventEmitter.playbackRateChange(0);
+                eventEmitter.playbackRateChange(0);
+//                pausePlayback();
                 audioManager.abandonAudioFocus(this);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -756,7 +751,7 @@ class ReactExoplayerView extends FrameLayout implements
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_READY:
-                text += "ready isPaused=" + isPaused + " isInBackground=" + isInBackground + " isFullscreen=" + isFullscreen+ " isInFullscreen=" + isInFullscreen;
+                text += "ready isPaused=" + isPaused + " isInBackground=" + isInBackground + " isFullscreen=" + isFullscreen + " isInFullscreen=" + isInFullscreen;
                 eventEmitter.ready();
 //                if (isInFullscreen) {
 //                    isInFullscreen = false;
@@ -769,11 +764,13 @@ class ReactExoplayerView extends FrameLayout implements
                 if (playerControlView != null) {
                     playerControlView.show();
                 }
-                if (!isPaused && !isFullscreen && !isInFullscreen) {
-                    eventEmitter.playbackRateChange(1);
-                } else if (!playWhenReady) {
-                    eventEmitter.playbackRateChange(0);
-                }
+
+//                if (!isPaused && !isFullscreen && !isInFullscreen) {
+//                    eventEmitter.playbackRateChange(1);
+//                } else if (!playWhenReady) {
+//                    eventEmitter.playbackRateChange(0);
+//                }
+                handleStateReady(playWhenReady, playbackState);
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_ENDED:
@@ -814,8 +811,8 @@ class ReactExoplayerView extends FrameLayout implements
             String trackId = videoFormat != null ? videoFormat.id : "-1";
             eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
-            if(!isPaused)
-            this.startPlayback();
+            if (!isPaused)
+                this.startPlayback();
         }
     }
 
@@ -1335,6 +1332,23 @@ class ReactExoplayerView extends FrameLayout implements
                 removeViewAt(indexOfPC);
             }
         }
+    }
+
+    private void handleStateReady(boolean playWhenReady, int playbackState) {
+        //Case foreground only
+        if (playWhenReady) {
+            if (isPaused) {
+                eventEmitter.playbackRateChange(0);
+            } else {
+                eventEmitter.playbackRateChange(1);
+            }
+        } else {
+            //Case background only
+            if (isInBackground && !isFullscreen) {
+                eventEmitter.playbackRateChange(0);
+            }
+        }
+
     }
 
     public interface FullScreenDelegate {

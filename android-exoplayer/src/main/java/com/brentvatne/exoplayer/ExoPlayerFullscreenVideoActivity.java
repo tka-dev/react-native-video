@@ -134,7 +134,7 @@ public class ExoPlayerFullscreenVideoActivity extends AppCompatActivity implemen
 
     @Override
     public void closeFullScreen() {
-        ReactExoplayerView.getViewInstance(id).setPausedModifier(true);
+        //ReactExoplayerView.getViewInstance(id).setPausedModifier(true);
         finish();
     }
 }
