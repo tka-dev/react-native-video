@@ -263,9 +263,10 @@ class ReactExoplayerView extends FrameLayout implements
                 player.setPlayWhenReady(true);
                 syncPlayerState();
             }
-            isPaused = false;
+//            isPaused = !player.getPlayWhenReady();
             isInFullscreen = false;
-            this.startPlayback();
+//            if(!isPaused && player.getPlayWhenReady())
+//            this.startPlayback();
         }
 
         isInBackground = false;
@@ -642,6 +643,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void pausePlayback() {
+        Log.d(TAG, "pausePlayback");
         if (player != null) {
             if (player.getPlayWhenReady()) {
                 setPlayWhenReady(false);
@@ -692,8 +694,9 @@ class ReactExoplayerView extends FrameLayout implements
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_LOSS:
                 eventEmitter.audioFocusChanged(false);
-                pausePlayback();
-//                eventEmitter.playbackRateChange(0);
+                // Fixed bug sometime click play player does not play
+              //  pausePlayback();
+             //  eventEmitter.playbackRateChange(0);
                 audioManager.abandonAudioFocus(this);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -744,7 +747,6 @@ class ReactExoplayerView extends FrameLayout implements
                 if (!playWhenReady) {
                     setKeepScreenOn(false);
                 }
-                eventEmitter.playbackRateChange(0);
                 break;
             case Player.STATE_BUFFERING:
                 text += "buffering";
@@ -766,7 +768,7 @@ class ReactExoplayerView extends FrameLayout implements
                 if (playerControlView != null) {
                     playerControlView.show();
                 }
-                if (playWhenReady && !isPaused && !isFullscreen && !isInFullscreen) {
+                if (!isPaused && !isFullscreen && !isInFullscreen) {
                     eventEmitter.playbackRateChange(1);
                 } else if (!playWhenReady) {
                     eventEmitter.playbackRateChange(0);
@@ -811,6 +813,7 @@ class ReactExoplayerView extends FrameLayout implements
             String trackId = videoFormat != null ? videoFormat.id : "-1";
             eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
+            if(!isPaused)
             this.startPlayback();
         }
     }
