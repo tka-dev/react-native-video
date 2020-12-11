@@ -695,8 +695,9 @@ class ReactExoplayerView extends FrameLayout implements
             case AudioManager.AUDIOFOCUS_LOSS:
                 eventEmitter.audioFocusChanged(false);
                 // Fixed bug sometime click play player does not play
-              //  pausePlayback();
-             //  eventEmitter.playbackRateChange(0);
+                //if(isInBackground && !isInFullscreen)
+                pausePlayback();
+//                eventEmitter.playbackRateChange(0);
                 audioManager.abandonAudioFocus(this);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -755,7 +756,7 @@ class ReactExoplayerView extends FrameLayout implements
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_READY:
-                text += "ready isPaused=" + isPaused + " isInBackground=" + isInBackground;
+                text += "ready isPaused=" + isPaused + " isInBackground=" + isInBackground + " isFullscreen=" + isFullscreen+ " isInFullscreen=" + isInFullscreen;
                 eventEmitter.ready();
 //                if (isInFullscreen) {
 //                    isInFullscreen = false;
