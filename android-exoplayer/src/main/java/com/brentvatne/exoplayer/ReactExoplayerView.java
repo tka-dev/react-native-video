@@ -811,8 +811,8 @@ class ReactExoplayerView extends FrameLayout implements
             String trackId = videoFormat != null ? videoFormat.id : "-1";
             eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
-            if (!isPaused)
-                this.startPlayback();
+            this.setPausedModifier(!isPaused);
+            //this.startPlayback();
         }
     }
 
