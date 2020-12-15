@@ -4,4 +4,6 @@
 @protocol RCTVideoPlayerViewControllerDelegate <NSObject>
 - (void)videoPlayerViewControllerWillDismiss:(AVPlayerViewController *)playerViewController;
 - (void)videoPlayerViewControllerDidDismiss:(AVPlayerViewController *)playerViewController;
+
+- (void)videoPlayerViewControllerWillAppear:(AVPlayerViewController *)playerViewController;
 @end

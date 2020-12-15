@@ -21,6 +21,12 @@
   [_rctDelegate videoPlayerViewControllerDidDismiss:self];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [_rctDelegate videoPlayerViewControllerWillAppear:self];
+}
+
 #if !TARGET_OS_TV
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
   return UIInterfaceOrientationMaskAll;

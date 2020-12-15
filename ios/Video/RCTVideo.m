@@ -81,6 +81,7 @@ static int const RCTVideoUnset = -1;
   BOOL _fullscreenAutorotate;
   NSString * _fullscreenOrientation;
   BOOL _fullscreenPlayerPresented;
+  BOOL _fullscreenPresented;
   NSString *_filterName;
   BOOL _filterEnabled;
   UIViewController * _presentingViewController;
@@ -97,7 +98,7 @@ static int const RCTVideoUnset = -1;
 {
   if ((self = [super init])) {
     _eventDispatcher = eventDispatcher;
-	  _automaticallyWaitsToMinimizeStalling = YES;
+      _automaticallyWaitsToMinimizeStalling = YES;
     _playbackRateObserverRegistered = NO;
     _isExternalPlaybackActiveObserverRegistered = NO;
     _playbackStalled = NO;
@@ -356,10 +357,13 @@ static int const RCTVideoUnset = -1;
 
 - (void)setSrc:(NSDictionary *)source
 {
+//    if(_source == source) {return;}
   _source = source;
   [self removePlayerLayer];
   [self removePlayerTimeObserver];
   [self removePlayerItemObservers];
+    [_player removeObserver:self forKeyPath:playbackRate context:nil];
+  
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) 0), dispatch_get_main_queue(), ^{
     
     // perform on next run loop, otherwise other passed react-props may not be set
@@ -722,8 +726,13 @@ static int const RCTVideoUnset = -1;
               // Playback is resuming, apply rate modifer.
               [_player setRate:_rate];
             } else if(self.onPlaybackRateChange) {
+            float currentPause = _paused ? 1 : 0;
+            NSLog(@"currentPause %li", (long)currentPause);
+            NSLog(@"player rate %li", (long)_player.rate);
+            if(_rate != _player.rate && ((_player.rate) == currentPause))
               self.onPlaybackRateChange(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
                                           @"target": self.reactTag});
+                _rate = _player.rate;
             }
             if(_playbackStalled && _player.rate > 0) {
               if(self.onPlaybackResume) {
@@ -752,6 +761,7 @@ static int const RCTVideoUnset = -1;
 
             [self.reactViewController.view setFrame:[UIScreen mainScreen].bounds];
             [self.reactViewController.view setNeedsLayout];
+            _fullscreenPresented = true;
           } else NSLog(@"not fullscreen");
         }
 
@@ -960,12 +970,11 @@ static int const RCTVideoUnset = -1;
     if (@available(iOS 10.0, *) && !_automaticallyWaitsToMinimizeStalling) {
       [_player playImmediatelyAtRate:_rate];
     } else {
-      [_player play];
-      [_player setRate:_rate];
+        [_player play];
     }
-    [_player setRate:_rate];
+    [_player setRate:1];
   }
-  
+    NSLog(@"setPaused playbackRate %li", (long)_rate);
   _paused = paused;
 }
 
@@ -1056,8 +1065,8 @@ static int const RCTVideoUnset = -1;
 
 - (void)setAutomaticallyWaitsToMinimizeStalling:(BOOL)waits
 {
-	_automaticallyWaitsToMinimizeStalling = waits;
-	_player.automaticallyWaitsToMinimizeStalling = waits;
+    _automaticallyWaitsToMinimizeStalling = waits;
+    _player.automaticallyWaitsToMinimizeStalling = waits;
 }
 
 
@@ -1332,6 +1341,7 @@ static int const RCTVideoUnset = -1;
 - (void)setFullscreen:(BOOL) fullscreen {
   if( fullscreen && !_fullscreenPlayerPresented && _player )
   {
+    [self removePlayerLayer];
     // Ensure player view controller is not null
     if( !_playerViewController )
     {
@@ -1361,6 +1371,7 @@ static int const RCTVideoUnset = -1;
         _playerViewController.showsPlaybackControls = YES;
         _fullscreenPlayerPresented = fullscreen;
         _playerViewController.autorotate = _fullscreenAutorotate;
+        _playerViewController.preferredOrientation = _fullscreenOrientation;
         if(self.onVideoFullscreenPlayerDidPresent) {
           self.onVideoFullscreenPlayerDidPresent(@{@"target": self.reactTag});
         }
@@ -1483,8 +1494,12 @@ static int const RCTVideoUnset = -1;
 
 - (void)videoPlayerViewControllerWillDismiss:(AVPlayerViewController *)playerViewController
 {
+//  if(_fullscreenPresented)
+//      [self removePlayerLayer];
   if (_playerViewController == playerViewController && _fullscreenPlayerPresented && self.onVideoFullscreenPlayerWillDismiss)
   {
+      [self usePlayerLayer];
+      [self applyModifiers];
     @try{
       [_playerViewController.contentOverlayView removeObserver:self forKeyPath:@"frame"];
       [_playerViewController removeObserver:self forKeyPath:readyForDisplayKeyPath];
@@ -1507,6 +1522,23 @@ static int const RCTVideoUnset = -1;
     }
   }
 }
+
+- (void)videoPlayerViewControllerWillAppear:(AVPlayerViewController *)playerViewController
+{
+    if(_fullscreenPresented) {
+        _fullscreenPresented = false;
+        dispatch_async(dispatch_get_main_queue(), ^{
+           // [_player setRate: _paused ? 0 : 1];
+            [self applyModifiers];
+//            if(_paused) {
+//                playerViewController.player.pause;
+//            } else {
+//                playerViewController.player.play;
+//            }
+        });
+    }
+}
+
 
 - (void)setFilter:(NSString *)filterName {
   _filterName = filterName;
