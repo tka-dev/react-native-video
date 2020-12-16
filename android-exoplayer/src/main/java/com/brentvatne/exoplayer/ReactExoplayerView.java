@@ -593,8 +593,8 @@ class ReactExoplayerView extends FrameLayout implements
             return true;
         }
         int result = audioManager.requestAudioFocus(this,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN);
+                AudioManager.AUDIOFOCUS_GAIN,
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
         return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
@@ -691,6 +691,7 @@ class ReactExoplayerView extends FrameLayout implements
             case AudioManager.AUDIOFOCUS_LOSS:
                 eventEmitter.audioFocusChanged(false);
                 // Fixed bug sometime click play player does not play
+//                if(!player.getPlayWhenReady())
                 eventEmitter.playbackRateChange(0);
 //                pausePlayback();
                 audioManager.abandonAudioFocus(this);
@@ -1214,6 +1215,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setPausedModifier(boolean paused) {
         isPaused = paused;
+        Log.d("setPausedModifier",Boolean.toString(isPaused));
         if (player != null) {
             if (!paused) {
                 startPlayback();
@@ -1346,6 +1348,12 @@ class ReactExoplayerView extends FrameLayout implements
             //Case background only
             if (isInBackground && !isFullscreen) {
                 eventEmitter.playbackRateChange(0);
+            } else if (!isInBackground && !isFullscreen) {
+                if(isPaused) {
+                    eventEmitter.playbackRateChange(0);
+                } else {
+                    eventEmitter.playbackRateChange(1);
+                }
             }
         }
 
