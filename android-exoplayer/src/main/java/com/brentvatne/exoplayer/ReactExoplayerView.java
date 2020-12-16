@@ -87,6 +87,7 @@ class ReactExoplayerView extends FrameLayout implements
     private static final int SHOW_PROGRESS = 1;
     private static Map<Integer, ReactExoplayerView> instances = new HashMap<>();
     private static int UNIQUE_ID = 0;
+    private int currentPlaybackRateChange = 1;
 
     static {
         DEFAULT_COOKIE_MANAGER = new CookieManager();
@@ -1340,19 +1341,34 @@ class ReactExoplayerView extends FrameLayout implements
         //Case foreground only
         if (playWhenReady) {
             if (isPaused) {
-                eventEmitter.playbackRateChange(0);
+                if(currentPlaybackRateChange >= 1) {
+                    eventEmitter.playbackRateChange(0);
+                    currentPlaybackRateChange = 0;
+                }
             } else {
-                eventEmitter.playbackRateChange(1);
+                if(currentPlaybackRateChange == 0) {
+                    eventEmitter.playbackRateChange(1);
+                    currentPlaybackRateChange = 1;
+                }
             }
         } else {
             //Case background only
             if (isInBackground && !isFullscreen) {
-                eventEmitter.playbackRateChange(0);
+                if(currentPlaybackRateChange >= 1) {
+                    eventEmitter.playbackRateChange(0);
+                    currentPlaybackRateChange = 0;
+                }
             } else if (!isInBackground && !isFullscreen) {
                 if(isPaused) {
-                    eventEmitter.playbackRateChange(0);
+                    if(currentPlaybackRateChange >= 1) {
+                        eventEmitter.playbackRateChange(0);
+                        currentPlaybackRateChange = 0;
+                    }
                 } else {
-                    eventEmitter.playbackRateChange(1);
+                    if(currentPlaybackRateChange == 0) {
+                        eventEmitter.playbackRateChange(1);
+                        currentPlaybackRateChange = 1;
+                    }
                 }
             }
         }
