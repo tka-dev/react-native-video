@@ -261,7 +261,7 @@ class ReactExoplayerView extends FrameLayout implements
             if (player != null) {
                 exoPlayerView.setPlayer(player);
                 syncPlayerState();
-                player.setPlayWhenReady(true);
+                //player.setPlayWhenReady(true);
             }
             isInFullscreen = false;
         }
@@ -1358,7 +1358,7 @@ class ReactExoplayerView extends FrameLayout implements
                     eventEmitter.playbackRateChange(0);
                     currentPlaybackRateChange = 0;
                 }
-            } else if (!isInBackground && !isFullscreen) {
+            } else {
                 if(isPaused) {
                     if(currentPlaybackRateChange >= 1) {
                         eventEmitter.playbackRateChange(0);
