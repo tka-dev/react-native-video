@@ -729,7 +729,8 @@ static int const RCTVideoUnset = -1;
             float currentPause = _paused ? 1 : 0;
             NSLog(@"currentPause %li", (long)currentPause);
             NSLog(@"player rate %li", (long)_player.rate);
-            if(_rate != _player.rate && ((_player.rate) == currentPause))
+//            if(_rate != _player.rate && ((_player.rate) == currentPause))
+            if(_rate != _player.rate)
               self.onPlaybackRateChange(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
                                           @"target": self.reactTag});
                 _rate = _player.rate;
