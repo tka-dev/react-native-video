@@ -362,8 +362,7 @@ static int const RCTVideoUnset = -1;
   [self removePlayerLayer];
   [self removePlayerTimeObserver];
   [self removePlayerItemObservers];
-    [_player removeObserver:self forKeyPath:playbackRate context:nil];
-  
+   
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) 0), dispatch_get_main_queue(), ^{
     
     // perform on next run loop, otherwise other passed react-props may not be set
@@ -730,7 +729,7 @@ static int const RCTVideoUnset = -1;
             NSLog(@"currentPause %li", (long)currentPause);
             NSLog(@"player rate %li", (long)_player.rate);
 //            if(_rate != _player.rate && ((_player.rate) == currentPause))
-            if(_rate != _player.rate)
+                if(_rate != _player.rate && ((_player.rate) == currentPause))
               self.onPlaybackRateChange(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
                                           @"target": self.reactTag});
                 _rate = _player.rate;
