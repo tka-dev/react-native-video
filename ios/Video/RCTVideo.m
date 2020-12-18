@@ -157,6 +157,10 @@ static int const RCTVideoUnset = -1;
   viewController.showsPlaybackControls = YES;
   viewController.rctDelegate = self;
   viewController.preferredOrientation = _fullscreenOrientation;
+    
+    if (@available(iOS 9.0, *)) {
+        viewController.allowsPictureInPicturePlayback = _pictureInPicture;
+    }
   
   viewController.view.frame = self.bounds;
   viewController.player = player;
@@ -726,10 +730,10 @@ static int const RCTVideoUnset = -1;
               [_player setRate:_rate];
             } else if(self.onPlaybackRateChange) {
             float currentPause = _paused ? 1 : 0;
-            NSLog(@"currentPause %li", (long)currentPause);
-            NSLog(@"player rate %li", (long)_player.rate);
+//            NSLog(@"currentPause %li", (long)currentPause);
+//            NSLog(@"player rate %li", (long)_player.rate);
 //            if(_rate != _player.rate && ((_player.rate) == currentPause))
-                if(_rate != _player.rate && ((_player.rate) == currentPause))
+             if(_rate != _player.rate)
               self.onPlaybackRateChange(@{@"playbackRate": [NSNumber numberWithFloat:_player.rate],
                                           @"target": self.reactTag});
                 _rate = _player.rate;
@@ -762,7 +766,9 @@ static int const RCTVideoUnset = -1;
             [self.reactViewController.view setFrame:[UIScreen mainScreen].bounds];
             [self.reactViewController.view setNeedsLayout];
             _fullscreenPresented = true;
-          } else NSLog(@"not fullscreen");
+          } else {
+              NSLog(@"not fullscreen");
+          }
         }
 
         return;
@@ -939,6 +945,8 @@ static int const RCTVideoUnset = -1;
 
 - (void)setPaused:(BOOL)paused
 {
+  NSLog(@"setPaused paused", paused ? @"YES" : @"NO");
+  NSLog(@"setPaused playbackRate %li", (long)_rate);
   if (paused) {
     [_player pause];
     [_player setRate:0.0];
@@ -974,7 +982,6 @@ static int const RCTVideoUnset = -1;
     }
     [_player setRate:1];
   }
-    NSLog(@"setPaused playbackRate %li", (long)_rate);
   _paused = paused;
 }
 
@@ -1525,10 +1532,14 @@ static int const RCTVideoUnset = -1;
 
 - (void)videoPlayerViewControllerWillAppear:(AVPlayerViewController *)playerViewController
 {
+    float currentPause = _rate > 0 ? false : true;
+        NSLog(@"currentPause %li", (long)currentPause);
     if(_fullscreenPresented) {
+        NSLog(@"videoPlayerViewControllerWillAppear", _fullscreenPresented);
         _fullscreenPresented = false;
         dispatch_async(dispatch_get_main_queue(), ^{
            // [_player setRate: _paused ? 0 : 1];
+            self->_paused = currentPause;
             [self applyModifiers];
 //            if(_paused) {
 //                playerViewController.player.pause;

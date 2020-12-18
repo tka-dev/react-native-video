@@ -813,8 +813,10 @@ class ReactExoplayerView extends FrameLayout implements
             String trackId = videoFormat != null ? videoFormat.id : "-1";
             eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
-            this.setPausedModifier(!isPaused);
-            //this.startPlayback();
+            this.setPausedModifier(isPaused);
+//            if (player.getPlaybackState() != Player.STATE_ENDED) {
+//                this.startPlayback();
+//            }
         }
     }
 
@@ -1341,34 +1343,34 @@ class ReactExoplayerView extends FrameLayout implements
         //Case foreground only
         if (playWhenReady) {
             if (isPaused) {
-                if(currentPlaybackRateChange >= 1) {
+//                if(currentPlaybackRateChange >= 1) {
                     eventEmitter.playbackRateChange(0);
                     currentPlaybackRateChange = 0;
-                }
+//                }
             } else {
-                if(currentPlaybackRateChange == 0) {
+//                if(currentPlaybackRateChange == 0) {
                     eventEmitter.playbackRateChange(1);
                     currentPlaybackRateChange = 1;
-                }
+//                }
             }
         } else {
             //Case background only
             if (isInBackground && !isFullscreen) {
-                if(currentPlaybackRateChange >= 1) {
+//                if(currentPlaybackRateChange >= 1) {
                     eventEmitter.playbackRateChange(0);
                     currentPlaybackRateChange = 0;
-                }
+//                }
             } else {
                 if(isPaused) {
-                    if(currentPlaybackRateChange >= 1) {
+//                    if(currentPlaybackRateChange >= 1) {
                         eventEmitter.playbackRateChange(0);
                         currentPlaybackRateChange = 0;
-                    }
+//                    }
                 } else {
-                    if(currentPlaybackRateChange == 0) {
+//                    if(currentPlaybackRateChange == 0) {
                         eventEmitter.playbackRateChange(1);
                         currentPlaybackRateChange = 1;
-                    }
+//                    }
                 }
             }
         }
