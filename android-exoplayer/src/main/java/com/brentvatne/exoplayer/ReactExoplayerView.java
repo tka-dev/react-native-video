@@ -620,6 +620,7 @@ class ReactExoplayerView extends FrameLayout implements
                 case Player.STATE_IDLE:
                 case Player.STATE_ENDED:
                     initializePlayer();
+                    Log.d(TAG,"startPlayback STATE_ENDED");
                     break;
                 case Player.STATE_BUFFERING:
                 case Player.STATE_READY:
@@ -813,7 +814,8 @@ class ReactExoplayerView extends FrameLayout implements
             String trackId = videoFormat != null ? videoFormat.id : "-1";
             eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
-            this.setPausedModifier(isPaused);
+            this.setPausedModifier(false);
+
 //            if (player.getPlaybackState() != Player.STATE_ENDED) {
 //                this.startPlayback();
 //            }
