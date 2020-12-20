@@ -851,9 +851,11 @@ static int const RCTVideoUnset = -1;
     AVPlayerItem *item = [notification object];
     [item seekToTime:kCMTimeZero];
     [self applyModifiers];
-  } else {
-    [self removePlayerTimeObserver];
   }
+// Can seek after end
+//  } else {
+////    [self removePlayerTimeObserver];
+//  }
 }
 
 #pragma mark - Prop setters

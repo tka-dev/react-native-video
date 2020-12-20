@@ -150,8 +150,8 @@ class ReactExoplayerView extends FrameLayout implements
             switch (msg.what) {
                 case SHOW_PROGRESS:
                     if (player != null
-                            && player.getPlaybackState() == Player.STATE_READY
-                            && player.getPlayWhenReady()
+//                            && player.getPlaybackState() == Player.STATE_READY
+//                            && player.getPlayWhenReady()
                     ) {
                         long pos = player.getCurrentPosition();
                         long bufferedDuration = player.getBufferedPercentage() * player.getDuration() / 100;
@@ -750,7 +750,8 @@ class ReactExoplayerView extends FrameLayout implements
             case Player.STATE_BUFFERING:
                 text += "buffering";
                 onBuffering(true);
-                clearProgressMessageHandler();
+                startProgressHandler();
+//                clearProgressMessageHandler();
                 setKeepScreenOn(preventsDisplaySleepDuringVideoPlayback);
                 break;
             case Player.STATE_READY:
