@@ -286,7 +286,7 @@ static int const RCTVideoUnset = -1;
   
   [[NSNotificationCenter defaultCenter] postNotificationName:@"RCTVideo_progress" object:nil userInfo:@{@"progress": [NSNumber numberWithDouble: currentTimeSecs / duration]}];
   
-  if( currentTimeSecs >= 0 && self.onVideoProgress) {
+  if( currentTimeSecs >= 0 && currentTimeSecs <= duration && self.onVideoProgress) {
     self.onVideoProgress(@{
                            @"currentTime": [NSNumber numberWithFloat:CMTimeGetSeconds(currentTime)],
                            @"playableDuration": [self calculatePlayableDuration],
@@ -766,8 +766,23 @@ static int const RCTVideoUnset = -1;
             [self.reactViewController.view setFrame:[UIScreen mainScreen].bounds];
             [self.reactViewController.view setNeedsLayout];
             _fullscreenPresented = true;
+            
+              if (@available(iOS 12, *)) {
+                  dispatch_async(dispatch_get_main_queue(), ^{
+                      UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
+                      NSNumber *value = [NSNumber numberWithInt:UIInterfaceOrientationLandscapeRight];
+                      [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+                      [UIViewController attemptRotationToDeviceOrientation];
+                  });
+              }
           } else {
               NSLog(@"not fullscreen");
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
+                  NSNumber *value = [NSNumber numberWithInt:UIInterfaceOrientationPortrait];
+                  [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+                  [UIViewController attemptRotationToDeviceOrientation];
+              });
           }
         }
 
