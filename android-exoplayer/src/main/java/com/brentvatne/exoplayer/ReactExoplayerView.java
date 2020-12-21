@@ -694,8 +694,8 @@ class ReactExoplayerView extends FrameLayout implements
                 eventEmitter.audioFocusChanged(false);
                 // Fixed bug sometime click play player does not play
 //                if(!player.getPlayWhenReady())
-                eventEmitter.playbackRateChange(0);
-//                pausePlayback();
+//                eventEmitter.playbackRateChange(0);
+                pausePlayback();
                 audioManager.abandonAudioFocus(this);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
