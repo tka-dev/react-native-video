@@ -87,7 +87,6 @@ class ReactExoplayerView extends FrameLayout implements
     private static final int SHOW_PROGRESS = 1;
     private static Map<Integer, ReactExoplayerView> instances = new HashMap<>();
     private static int UNIQUE_ID = 0;
-    private int currentPlaybackRateChange = 1;
 
     static {
         DEFAULT_COOKIE_MANAGER = new CookieManager();
@@ -101,6 +100,7 @@ class ReactExoplayerView extends FrameLayout implements
     private final ThemedReactContext themedReactContext;
     private final AudioManager audioManager;
     private final AudioBecomingNoisyReceiver audioBecomingNoisyReceiver;
+    private int currentPlaybackRateChange = 1;
     private int uid = ++UNIQUE_ID;
     private FullScreenDelegate fullScreenDelegate;
     private PlayerControlView playerControlView;
@@ -253,6 +253,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onHostResume() {
+        Log.d(TAG , "onHostResume");
         if (!playInBackground || !isInBackground) {
             setPlayWhenReady(!isPaused);
         }
@@ -271,6 +272,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onHostPause() {
+        Log.d(TAG , "onHostPause");
         isInBackground = true;
         if (playInBackground) {
             return;
@@ -600,6 +602,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void setPlayWhenReady(boolean playWhenReady) {
+        Log.d(TAG, "setPlayWhenReady");
         if (player == null) {
             return;
         }
@@ -615,12 +618,13 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void startPlayback() {
+        Log.d(TAG, "setPlayWhenReady");
         if (player != null) {
             switch (player.getPlaybackState()) {
                 case Player.STATE_IDLE:
                 case Player.STATE_ENDED:
                     initializePlayer();
-                    Log.d(TAG,"startPlayback STATE_ENDED");
+                    Log.d(TAG, "startPlayback STATE_ENDED");
                     break;
                 case Player.STATE_BUFFERING:
                 case Player.STATE_READY:
@@ -642,6 +646,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     private void pausePlayback() {
         Log.d(TAG, "pausePlayback");
+        isPaused = true;
         if (player != null) {
             if (player.getPlayWhenReady()) {
                 setPlayWhenReady(false);
@@ -656,6 +661,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void onStopPlayback() {
+        Log.d(TAG, "onStopPlayback");
         //eventEmitter.playbackRateChange(0);
         audioManager.abandonAudioFocus(this);
     }
@@ -689,12 +695,11 @@ class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onAudioFocusChange(int focusChange) {
+        Log.d(TAG, "onAudioFocusChange");
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_LOSS:
                 eventEmitter.audioFocusChanged(false);
-                // Fixed bug sometime click play player does not play
-//                if(!player.getPlayWhenReady())
-//                eventEmitter.playbackRateChange(0);
+                //Fixed bug pause background
                 pausePlayback();
                 audioManager.abandonAudioFocus(this);
                 break;
@@ -1221,7 +1226,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setPausedModifier(boolean paused) {
         isPaused = paused;
-        Log.d("setPausedModifier",Boolean.toString(isPaused));
+        Log.d("setPausedModifier", Boolean.toString(isPaused));
         if (player != null) {
             if (!paused) {
                 startPlayback();
@@ -1346,34 +1351,24 @@ class ReactExoplayerView extends FrameLayout implements
         //Case foreground only
         if (playWhenReady) {
             if (isPaused) {
-//                if(currentPlaybackRateChange >= 1) {
-                    eventEmitter.playbackRateChange(0);
-                    currentPlaybackRateChange = 0;
-//                }
+                eventEmitter.playbackRateChange(0);
+                currentPlaybackRateChange = 0;
             } else {
-//                if(currentPlaybackRateChange == 0) {
-                    eventEmitter.playbackRateChange(1);
-                    currentPlaybackRateChange = 1;
-//                }
+                eventEmitter.playbackRateChange(1);
+                currentPlaybackRateChange = 1;
             }
         } else {
             //Case background only
             if (isInBackground && !isFullscreen) {
-//                if(currentPlaybackRateChange >= 1) {
+                eventEmitter.playbackRateChange(0);
+                currentPlaybackRateChange = 0;
+            } else {
+                if (isPaused) {
                     eventEmitter.playbackRateChange(0);
                     currentPlaybackRateChange = 0;
-//                }
-            } else {
-                if(isPaused) {
-//                    if(currentPlaybackRateChange >= 1) {
-                        eventEmitter.playbackRateChange(0);
-                        currentPlaybackRateChange = 0;
-//                    }
                 } else {
-//                    if(currentPlaybackRateChange == 0) {
-                        eventEmitter.playbackRateChange(1);
-                        currentPlaybackRateChange = 1;
-//                    }
+                    eventEmitter.playbackRateChange(1);
+                    currentPlaybackRateChange = 1;
                 }
             }
         }
