@@ -144,6 +144,7 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean disableFocus;
     private boolean preventsDisplaySleepDuringVideoPlayback = true;
     private float mProgressUpdateInterval = 250.0f;
+
     private final Handler progressHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -359,7 +360,7 @@ class ReactExoplayerView extends FrameLayout implements
 
         // Setting the player for the playerControlView
         playerControlView.setPlayer(player);
-        playerControlView.show();
+        playerControlView.hide();
         playPauseControlContainer = playerControlView.findViewById(R.id.exo_play_pause_container);
         playerControlView.findViewById(R.id.exo_fullscreen_button).setOnClickListener(v -> setFullscreen(true));
 
@@ -589,6 +590,7 @@ class ReactExoplayerView extends FrameLayout implements
         themedReactContext.removeLifecycleEventListener(this);
         audioBecomingNoisyReceiver.removeListener();
         bandwidthMeter.removeEventListener(this);
+//        handler.removeCallbacks(delayedShowPlayerControlView);
     }
 
     private boolean requestAudioFocus() {
@@ -771,10 +773,13 @@ class ReactExoplayerView extends FrameLayout implements
                 startProgressHandler();
                 videoLoaded();
                 // Setting the visibility for the playerControlView
-                if (playerControlView != null) {
-                    playerControlView.show();
-                }
+                new Handler().postDelayed(() -> {
+                    if (playerControlView != null) {
+                        togglePlayerControlVisibility();
+                } },300);
 
+//                handler.postDelayed(delayedShowPlayerControlView,
+//                        TimeUnit.SECONDS.toMillis(2));
 //                if (!isPaused && !isFullscreen && !isInFullscreen) {
 //                    eventEmitter.playbackRateChange(1);
 //                } else if (!playWhenReady) {
