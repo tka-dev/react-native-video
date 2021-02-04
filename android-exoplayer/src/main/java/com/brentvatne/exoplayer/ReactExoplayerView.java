@@ -481,7 +481,7 @@ class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setPlayer(player);
         audioBecomingNoisyReceiver.setListener(self);
         bandwidthMeter.addEventListener(new Handler(), self);
-        setPlayWhenReady(!isPaused);
+//        setPlayWhenReady(!isPaused);
         playerNeedsSource = true;
 
         PlaybackParameters params = new PlaybackParameters(rate, 1f);
